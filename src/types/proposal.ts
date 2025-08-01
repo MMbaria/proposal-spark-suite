@@ -31,6 +31,7 @@ export interface ProposalSectionData {
 }
 
 export interface ProposalBudget {
+  totalRequested: number;
   directCosts: number;
   indirectCosts: number;
   totalCosts: number;
@@ -123,6 +124,8 @@ export interface ProposalMetadata {
   discipline: string;
   fundingAmount: number;
   projectDuration: number; // in months
+  duration?: string;
+  useAITemplate?: boolean;
   collaboratingInstitutions: string[];
   keywords: string[];
   complianceChecks: ComplianceCheck[];

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Calendar, Clock, Users, Target, FileText, Brain, TrendingUp, Settings, Plus } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 // Foundation Components
 import { ProposalSection } from "@/components/proposal/ProposalSection";
@@ -11,6 +12,7 @@ import { BudgetBuilder } from "@/components/budget/BudgetBuilder";
 import { TeamManagement } from "@/components/collaboration/TeamManagement";
 import { TemplateSystem } from "@/components/templates/TemplateSystem";
 import { TimelineManager } from "@/components/timeline/TimelineManager";
+import { NewProposalModal } from "@/components/proposal/NewProposalModal";
 
 // Types
 import type { Proposal, ProposalStats } from "@/types/proposal";
@@ -68,6 +70,9 @@ const statusConfig = {
 
 export const Dashboard = () => {
   const [activeTab, setActiveTab] = useState<"overview" | "proposals" | "team" | "templates" | "timeline">("overview");
+  const [proposals, setProposals] = useState<DashboardProposal[]>(mockProposals);
+  const [showNewProposalModal, setShowNewProposalModal] = useState(false);
+  const { toast } = useToast();
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
@@ -107,7 +112,11 @@ export const Dashboard = () => {
                 ))}
               </div>
               
-              <Button variant="gradient" size="sm">
+              <Button 
+                variant="gradient" 
+                size="sm"
+                onClick={() => setShowNewProposalModal(true)}
+              >
                 <Plus className="h-4 w-4" />
                 New Proposal
               </Button>
@@ -422,6 +431,35 @@ export const Dashboard = () => {
           />
         )}
       </div>
+
+      {/* New Proposal Modal */}
+      <NewProposalModal
+        open={showNewProposalModal}
+        onOpenChange={setShowNewProposalModal}
+        onCreateProposal={(proposalData) => {
+          // Create new proposal with unique ID
+          const newProposal: DashboardProposal = {
+            id: Date.now().toString(),
+            title: proposalData.title,
+            funder: proposalData.funder,
+            deadline: proposalData.deadline.toISOString().split('T')[0],
+            status: "draft",
+            progress: 0,
+            team: [],
+            budget: proposalData.budget.totalRequested > 0 ? `$${proposalData.budget.totalRequested.toLocaleString()}` : "$0"
+          };
+
+          setProposals(prev => [newProposal, ...prev]);
+          
+          toast({
+            title: "Proposal Created",
+            description: `"${proposalData.title}" has been created successfully.`,
+          });
+
+          // Switch to proposals tab to show the new proposal
+          setActiveTab("proposals");
+        }}
+      />
     </div>
   );
 };
