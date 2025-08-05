@@ -324,6 +324,102 @@ export const Dashboard = () => {
           </>
         )}
 
+        {/* Proposals Tab */}
+        {activeTab === "proposals" && (
+          <div className="space-y-6">
+            <Card className="shadow-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-primary" />
+                  Proposal Management
+                </CardTitle>
+                <CardDescription>
+                  Create, edit, and manage your grant proposals with dynamic sections
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {proposals.map((proposal) => (
+                    <div key={proposal.id} className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="text-lg font-semibold">{proposal.title}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            {proposal.funder} • Due: {proposal.deadline}
+                          </p>
+                        </div>
+                        <Badge className={statusConfig[proposal.status].color}>
+                          {statusConfig[proposal.status].label}
+                        </Badge>
+                      </div>
+                      
+                      <ProposalSection
+                        schema={{
+                          id: `${proposal.id}-summary`,
+                          title: "Project Summary",
+                          description: `Overview and significance of your project for ${proposal.funder}`,
+                          required: true,
+                          wordLimit: 500,
+                          wordMinimum: 100,
+                          placeholder: "Provide a clear, concise summary of your project's objectives, methodology, and expected outcomes...",
+                          funderSpecific: {
+                            "National Science Foundation": {
+                              guidelines: "NSF requires a one-page project summary that describes the intellectual merit and broader impacts of the proposed work."
+                            },
+                            "National Institutes of Health": {
+                              guidelines: "NIH project summary should highlight the relevance to human health and disease."
+                            }
+                          }
+                        }}
+                        funder={proposal.funder}
+                        onContentChange={(id, content) => console.log("Content updated:", id, content)}
+                        onValidationChange={(id, isValid, errors) => console.log("Validation:", id, isValid, errors)}
+                      />
+                      
+                      <ProposalSection
+                        schema={{
+                          id: `${proposal.id}-aims`,
+                          title: "Specific Aims",
+                          description: "Clearly state the goals and objectives of your research",
+                          required: true,
+                          wordLimit: 1000,
+                          wordMinimum: 200,
+                          placeholder: "List 2-3 specific aims that describe what you plan to accomplish...",
+                          funderSpecific: {
+                            "National Institutes of Health": {
+                              guidelines: "State concisely the goals of the proposed research and summarize the expected outcome(s)."
+                            }
+                          }
+                        }}
+                        funder={proposal.funder}
+                        onContentChange={(id, content) => console.log("Content updated:", id, content)}
+                        onValidationChange={(id, isValid, errors) => console.log("Validation:", id, isValid, errors)}
+                      />
+                    </div>
+                  ))}
+                  
+                  {proposals.length === 0 && (
+                    <div className="text-center py-12">
+                      <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">No proposals yet</h3>
+                      <p className="text-muted-foreground mb-4">
+                        Create your first proposal to start writing grant applications
+                      </p>
+                      <Button 
+                        variant="gradient"
+                        onClick={() => setShowNewProposalModal(true)}
+                      >
+                        <Plus className="h-4 w-4" />
+                        Create First Proposal
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* Team Management Tab */}
         {activeTab === "team" && (
           <TeamManagement 
